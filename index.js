@@ -1,5 +1,6 @@
 const express = require("express");
-const { dbSetup } = require("./config/mongoDb");
+import { connect } from "mongoose";
+import mongoose from "mongoose";
 const cors = require("cors");
 const dotenv = require("dotenv");
 const authRoute = require("./routes/auth.route");
@@ -10,7 +11,16 @@ const swaggerOptions = require("./swagger.json");
 dotenv.config();
 
 // db connection
-dbSetup();
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URL);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+}
+
 
 const server = express();
 
