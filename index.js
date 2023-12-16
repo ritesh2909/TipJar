@@ -32,6 +32,8 @@ server.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerOptions));
 // implementing routes
 server.use("/api/auth", authRoute.router);
 
-server.listen(process.env.PORT, () =>
-  console.log(`Server running on http://localhost:${process.env.PORT}`)
-);
+connectDB().then(() => {
+    server.listen(process.env.PORT, () => {
+        console.log("listening for requests");
+    })
+})
