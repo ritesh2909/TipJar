@@ -1,6 +1,5 @@
 const express = require("express");
-import { connect } from "mongoose";
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const authRoute = require("./routes/auth.route");
