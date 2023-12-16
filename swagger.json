@@ -1,0 +1,164 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "TipJar Backend",
+    "version": "V1"
+  },
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/api/auth/v1/request-otp/{mobile}": {
+      "post": {
+        "parameters": [
+          {
+            "name": "mobile",
+            "description": "Mobile number for OTP Signup",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["AuthController"],
+        "responses": {
+          "204": {
+            "description": "OTP Sent successfully"
+          },
+          "422": {
+            "description": "Invalid Mobile Number"
+          }
+        }
+      }
+    },
+    "/api/auth/v1/register": {
+      "post": {
+        "tags": ["AuthController"],
+        "parameters": [
+          {
+            "name": "User Registration",
+            "description": "User Registration",
+            "in": "body",
+            "required": "true",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mobile": {
+                  "type": "string",
+                  "description": "Users mobile number"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "Users Email"
+                },
+                "firstName": {
+                  "type": "string",
+                  "description": "Users First Name"
+                },
+                "middleName": {
+                  "type": "string",
+                  "description": "Users Middle Name"
+                },
+                "lastName": {
+                  "type": "string",
+                  "description": "Users Last Name"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OTP Sent successfully"
+          }
+        }
+      }
+    },
+    "/api/auth/v1/otp-login": {
+      "post": {
+        "tags": ["AuthController"],
+        "parameters": [
+          {
+            "name": "OTP Login",
+            "description": "OTP Login",
+            "in": "body",
+            "required": "true",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mobile": {
+                  "type": "string",
+                  "description": "Users mobile number"
+                },
+                "otp": {
+                  "type": "number",
+                  "description": "OTP"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users auth token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authtoken": {
+                  "type": "string",
+                  "description": "Authentication token"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/v1/google-login": {
+      "post": {
+        "tags": ["AuthController"],
+        "parameters": [
+          {
+            "name": "Google Login",
+            "description": "Google Login",
+            "in": "body",
+            "required": "true",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "idToken": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users Token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authtoken": {
+                  "type": "string",
+                  "description": "Authentication token"
+                }
+              }
+            }
+          },
+          "417": {
+            "description": "User not registered"
+          },
+          "422": {
+            "description": "Invalid Google Token"
+          },
+          "400": {
+            "description": "Token do not belong to verified email"
+          }
+        }
+      }
+    }
+  }
+}
