@@ -17,7 +17,13 @@ const sendNewOtpMail = (otp, to, type) => {
     ${otp} is the OTP to access your account on TipJar.
     
     This OTP is valid for 10 minutes & usable once.`;
-  sendNewMail(to, title, body);
+  try {
+    sendNewMail(to, title, body);
+  }
+  catch(error){
+    console.log(error);
+  }
+  
 };
 
 const sendNewMail = (to, subject, text) => {
