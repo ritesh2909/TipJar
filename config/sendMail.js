@@ -18,8 +18,10 @@ const sendNewOtpMail = (otp, to, type) => {
     
     This OTP is valid for 10 minutes & usable once.`;
   try {
+    console.log("Trying sending mail");
     sendNewMail(to, title, body);
   } catch (error) {
+    console.log("mail sending failed!");
     console.log(error);
   }
 };
