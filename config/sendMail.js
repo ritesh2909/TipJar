@@ -1,6 +1,5 @@
 var nodemailer = require("nodemailer");
 
-
 var transporter = nodemailer.createTransport({
   service: "gmail",
   port: 465,
@@ -20,11 +19,9 @@ const sendNewOtpMail = (otp, to, type) => {
     This OTP is valid for 10 minutes & usable once.`;
   try {
     sendNewMail(to, title, body);
-  }
-  catch(error){
+  } catch (error) {
     console.log(error);
   }
-  
 };
 
 const sendNewMail = (to, subject, text) => {
@@ -35,13 +32,17 @@ const sendNewMail = (to, subject, text) => {
     text: text,
   };
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Email sent: " + info.response);
-    }
-  });
+  try {
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = { sendNewMail, sendNewOtpMail };
