@@ -45,7 +45,7 @@ const userSchema = new Schema(
     googleToken: String,
     appleToken: String,
     lastLogin: { type: Date },
-
+    password: { type: String },
     token: { type: String },
     passwordChangedAt: {
       type: Date,
@@ -63,15 +63,8 @@ const userSchema = new Schema(
     gender: {
       type: String,
     },
-    followers: {
-      type: [String], // object ids of other users
-    },
-    following: {
-      type: [String],
-    },
     fcmToken: String,
     countryCode: String, // 91
-    hasContacted: String,
   },
   { timestamps: true }
 );

@@ -4,6 +4,7 @@ const { OAuth2Client } = require("google-auth-library");
 const { generateToken } = require("../config/jwtToken");
 const { sendNewOtpMail } = require("../config/sendMail");
 const moment = require("moment");
+const bcryptjs = require("bcryptjs");
 
 exports.requestOtp = async (req, res) => {
   const mobile = req.params.mobile;
@@ -23,15 +24,6 @@ exports.requestOtp = async (req, res) => {
     const otpBody = `${otpGenerated} is your OTP to login to TipJar. DO NOT share otp with anyone. TipJar never ask for OTP. This otp expires in 10 mins.`;
     sendNewOtpMail(otpGenerated, user.email, "Login");
     try {
-      const token = await generateToken(user?._id);
-      await User.findByIdAndUpdate(
-        user?.id,
-        {
-          token: token,
-          lastLogin: new Date(),
-        },
-        { $new: true }
-      );
       // sendOTP(otpBody, mobile); // uncomment this to start otp service
       return res.status(204).json("OTP Sent Successfully!");
     } catch (error) {
@@ -70,18 +62,9 @@ exports.registerUser = async (req, res) => {
     const otpGenerated = newOtp();
     newUser.passwordResetOtp = otpGenerated;
     newUser.otpExpires = moment().add(10, "minutes");
-    const savedUser = await newUser.save();
+    await newUser.save();
     const otpBody = `${otpGenerated} is your OTP to login to TipJar. DO NOT share otp with anyone. TipJar never ask for OTP. This otp expires in 10 mins.`;
     try {
-      const token = await generateToken(savedUser?._id);
-      await User.findByIdAndUpdate(
-        savedUser?.id,
-        {
-          token: token,
-          lastLogin: new Date(),
-        },
-        { $new: true }
-      );
       // sendOTP(otpBody, mobile); // uncomment this to start otp service
       try {
         sendNewOtpMail(otpGenerated, newUser.email, "Registeration");
@@ -129,8 +112,19 @@ exports.otpLogin = async (req, res) => {
     }
     user.passwordResetOtp = "";
     user.otpExpires = "";
-    await user.save();
-    return res.status(200).json({ authToken: user.token });
+    user = await user.save();
+    const token = generateToken(user?._id);
+    // updating token
+    const savedUser = await User.findByIdAndUpdate(
+      user?.id,
+      {
+        token: token,
+        lastLogin: new Date(),
+      },
+      { $new: true }
+    );
+
+    return res.status(200).json({ authToken: token });
   } catch (error) {
     console.log(error);
   }
@@ -189,5 +183,81 @@ exports.googleLogin = async (req, res) => {
   } else {
     // sending to the register screen and registering there
     return res.status(417).json("User does not exist");
+  }
+};
+
+exports.passwordRegister = async (req, res) => {
+  const reqBody = req.body;
+  if (!reqBody.mobile) {
+    return res.status(422).json("Mobile Number not found!");
+  }
+  if (reqBody.mobile.length != 10) {
+    return res.status(422).json("Invalid Mobile Number!");
+  }
+  let existingUser = await User.findOne({ mobile: reqBody?.mobile });
+  if (existingUser && existingUser.status !== UserStatusEnum.PENDING) {
+    return res
+      .status(400)
+      .json("Mobile number already registered. Please login!");
+  }
+  existingUser = await User.findOne({ email: reqBody.email });
+  if (existingUser) {
+    return res.status(400).json("Email already used. Please login!");
+  }
+
+  const salt = bcryptjs.genSaltSync(10);
+  const securePassword = bcryptjs.hashSync(reqBody.password, salt);
+  const newUser = new User({
+    status: UserStatusEnum.VERIFIED,
+    firstName: reqBody.firstName,
+    middleName: reqBody.middleName,
+    lastName: reqBody.lastName,
+    email: reqBody.email,
+    mobile: reqBody.mobile,
+    isSocialLogin: false,
+    password: securePassword,
+    countryCode: 91,
+  });
+
+  try {
+    await newUser.save();
+    return res.status(204).json("User Created Successfully!, Please Login!");
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json("Internal Server Error!");
+  }
+};
+
+exports.passwordLogin = async (req, res) => {
+  const reqBody = req.body;
+  let user = await User.findOne({
+    email: reqBody.email,
+  });
+
+  if (!user) {
+    return res.status(404).json("User with Email not found!");
+  }
+
+  const securePassword = await bcryptjs.compare(
+    reqBody.password,
+    user.password
+  );
+  if (!securePassword) {
+    return res.status(401).json("Wrong password!");
+  }
+  try {
+    const token = generateToken(user?._id);
+    // updating token
+    const savedUser = await User.findByIdAndUpdate(
+      user?.id,
+      {
+        token: token,
+        lastLogin: new Date(),
+      },
+      { $new: true }
+    );
+    return res.status(200).json({ authToken: token });
+  } catch (error) {
+    console.log(error);
   }
 };
