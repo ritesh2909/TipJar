@@ -5,6 +5,7 @@ const { generateToken } = require("../config/jwtToken");
 const { sendNewOtpMail } = require("../config/sendMail");
 const moment = require("moment");
 const bcryptjs = require("bcryptjs");
+const { usersTrackRegister, usersTrackLogin } = require("../utils/usersTrack");
 
 exports.requestOtp = async (req, res) => {
   const mobile = req.params.mobile;
@@ -71,6 +72,7 @@ exports.registerUser = async (req, res) => {
       } catch (error) {
         console.error(error);
       }
+      await usersTrackRegister(newUser._id, req.body.source);
       return res.status(204).json("OTP Sent Successfully!");
     } catch (err) {
       console.error(err);
@@ -123,7 +125,7 @@ exports.otpLogin = async (req, res) => {
       },
       { $new: true }
     );
-
+    await usersTrackLogin(savedUser?._id, req.body.source);
     return res.status(200).json({ authToken: token });
   } catch (error) {
     console.log(error);
@@ -207,6 +209,7 @@ exports.passwordRegister = async (req, res) => {
 
   const salt = bcryptjs.genSaltSync(10);
   const securePassword = bcryptjs.hashSync(reqBody.password, salt);
+
   const newUser = new User({
     status: UserStatusEnum.VERIFIED,
     firstName: reqBody.firstName,
@@ -220,7 +223,9 @@ exports.passwordRegister = async (req, res) => {
   });
 
   try {
-    await newUser.save();
+    const savedUser = await newUser.save();
+    // saving last login and platform
+    await usersTrackRegister(savedUser.id, reqBody.source);
     return res.status(204).json("User Created Successfully!, Please Login!");
   } catch (error) {
     console.error(error);
@@ -256,6 +261,7 @@ exports.passwordLogin = async (req, res) => {
       },
       { $new: true }
     );
+    await usersTrackLogin(user?._id, reqBody.source);
     return res.status(200).json({ authToken: token });
   } catch (error) {
     console.log(error);

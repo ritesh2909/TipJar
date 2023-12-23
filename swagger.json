@@ -61,6 +61,10 @@
                 "lastName": {
                   "type": "string",
                   "description": "Users Last Name"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Source of register app/website"
                 }
               }
             }
@@ -92,6 +96,10 @@
                 "otp": {
                   "type": "number",
                   "description": "OTP"
+                },
+                "sorce": {
+                  "type": "string",
+                  "description": "Source of login app/website"
                 }
               }
             }
@@ -195,6 +203,10 @@
                 "password": {
                   "type": "string",
                   "description": "Users Password"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Source of user app/website"
                 }
               }
             }
@@ -226,6 +238,10 @@
                 "password": {
                   "type": "string",
                   "description": "Password"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Source of login app/website"
                 }
               }
             }
