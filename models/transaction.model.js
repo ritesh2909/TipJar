@@ -22,6 +22,9 @@ const transactionSchema = new Schema(
     transactionDate: {
       type: Date,
     },
+    transactionId: {
+      type: Number,  
+    },
     name: {
       type: String,
     },

@@ -4,7 +4,7 @@
     "title": "TipJar Backend",
     "version": "V1"
   },
-  "schemes": ["http","https"],
+  "schemes": ["http", "https"],
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "paths": {
@@ -156,6 +156,93 @@
           },
           "400": {
             "description": "Token do not belong to verified email"
+          }
+        }
+      }
+    },
+    "/api/auth/v1/password/register": {
+      "post": {
+        "tags": ["AuthController"],
+        "parameters": [
+          {
+            "name": "User Registration using password",
+            "description": "User Registration using password",
+            "in": "body",
+            "required": "true",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mobile": {
+                  "type": "string",
+                  "description": "Users mobile number"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "Users Email"
+                },
+                "firstName": {
+                  "type": "string",
+                  "description": "Users First Name"
+                },
+                "middleName": {
+                  "type": "string",
+                  "description": "Users Middle Name"
+                },
+                "lastName": {
+                  "type": "string",
+                  "description": "Users Last Name"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Users Password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User Registered Successfully"
+          }
+        }
+      }
+    },
+    "/api/auth/v1/password/login": {
+      "post": {
+        "tags": ["AuthController"],
+        "parameters": [
+          {
+            "name": "Password Login",
+            "description": "Password Login",
+            "in": "body",
+            "required": "true",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "Users Email"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "Password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users auth token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "authtoken": {
+                  "type": "string",
+                  "description": "Authentication token"
+                }
+              }
+            }
           }
         }
       }
